@@ -1,0 +1,15 @@
+Python Backend Developer
+
+Requirements:
+- Python
+- FastAPI
+- REST APIs
+- SQL
+- Git
+- Docker
+- Problem Solving
+
+Responsibilities:
+Develop backend APIs using Python and FastAPI.
+Work with relational databases.
+Collaborate using Git.
