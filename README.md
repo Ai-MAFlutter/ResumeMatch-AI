@@ -1,127 +1,99 @@
 # 📄 ResumeMatch AI
 
-## 🚀 AI-Powered Resume Analyzer & ATS Matching System
+An AI-powered ATS Resume Analyzer that helps job seekers evaluate their resumes against job descriptions using LLMs, RAG, and NLP techniques.
 
-ResumeMatch AI is an intelligent resume analysis platform that uses **Artificial Intelligence, RAG (Retrieval-Augmented Generation), and Large Language Models** to analyze resumes, compare them with job descriptions, and provide actionable career improvement suggestions.
-
-The system helps candidates understand their resume strength, identify missing skills, and improve their chances of passing ATS (Applicant Tracking Systems).
+The system analyzes resumes, detects missing skills, provides AI-powered recommendations, and allows users to chat with their resume.
 
 ---
 
-# ✨ Features
+# 🚀 Features
 
-## 🎯 ATS Resume Matching
-
-- Calculates Resume Match Score against a Job Description.
-- Identifies matching and missing skills.
-- Provides an ATS compatibility evaluation.
-
----
-
-## 🤖 AI Resume Analysis
-
-Using LLM-powered analysis, the system provides:
-
-- Resume strengths.
-- Weakness identification.
-- Missing skill recommendations.
-- Learning roadmap.
-- Career improvement suggestions.
+✅ Upload Resume PDF  
+✅ Extract Resume Information Automatically  
+✅ Compare Resume with Job Description  
+✅ ATS Match Score Calculation  
+✅ Matching Skills Detection  
+✅ Missing Skills Identification  
+✅ AI Resume Feedback  
+✅ Learning Roadmap Recommendations  
+✅ Skill Radar Visualization  
+✅ Resume Chat Assistant using RAG  
+✅ Generate PDF Resume Report  
 
 ---
 
-## 📊 Interactive Dashboard
+# 🧠 How It Works
 
-The application provides visual insights using:
+1. User uploads a resume PDF.
 
-- ATS Gauge Score.
-- Skills Comparison Charts.
-- Skill Profile Radar Chart.
-- Interactive Plotly visualizations.
+2. The system extracts resume text using PDF processing.
 
----
+3. User provides a Job Description.
 
-## 💬 AI Resume Assistant
+4. Resume skills are compared with required job skills.
 
-Users can ask questions about their resume:
+5. ATS score is calculated.
 
-Examples:
+6. LLM generates:
+   - Resume evaluation
+   - Missing skills
+   - Improvement suggestions
+   - Career roadmap
 
-- "What skills should I improve?"
-- "How can I increase my ATS score?"
-- "Is my resume suitable for this position?"
-
-The assistant answers using the uploaded resume context through a RAG pipeline.
+7. User can ask questions about the resume using RAG.
 
 ---
 
-## 📄 PDF Report Generation
-
-Automatically generates a professional resume analysis report including:
-
-- ATS Score.
-- Matching Skills.
-- Missing Skills.
-- AI Recommendations.
-
----
-
-# 🧠 Architecture
-
-The project follows a Retrieval-Augmented Generation (RAG) architecture:
+# 🏗️ System Architecture
 
 ```
 Resume PDF
-    |
-    ↓
+     |
+     ↓
 PDF Text Extraction
-    |
-    ↓
+     |
+     ↓
 Text Cleaning & Chunking
-    |
-    ↓
-Vector / Search Index
-    |
-    ↓
-Relevant Context Retrieval
-    |
-    ↓
-LLM Analysis
-    |
-    ↓
-AI Resume Feedback
+     |
+     ↓
+Vector Search / Retrieval
+     |
+     ↓
+RAG Pipeline
+     |
+     ↓
+Groq LLM
+     |
+     ↓
+AI Resume Analysis
 ```
 
 ---
 
-# 🛠️ Technologies Used
+# 🛠️ Tech Stack
 
-## Programming
-
+### Programming Language
 - Python
 
-## AI & LLM
-
-- Groq API
-- LLM Models
+### AI & LLM
+- Groq LLM API
+- OpenAI SDK
 - Retrieval-Augmented Generation (RAG)
 
-## Backend / Processing
-
+### Framework
 - Streamlit
-- PDF Parsing
+
+### NLP & Search
+- MinSearch
 - Text Processing
 
-## Data & Visualization
-
+### Visualization
 - Plotly
-- Pandas
 
-## Development Tools
-
-- Git
-- GitHub
-- Virtual Environment
+### Other Tools
+- Python-dotenv
+- PDF Processing
+- Git & GitHub
 
 ---
 
@@ -131,47 +103,78 @@ AI Resume Feedback
 ResumeMatch-AI/
 
 │
-├── app.py              # Main Streamlit Application
-├── rag.py              # RAG and LLM Integration
-├── matcher.py          # Resume and Job Matching Logic
-├── parser.py           # PDF Extraction
-├── search.py           # Search Index
-├── chunking.py         # Text Chunking
-├── pdf_report.py       # PDF Report Generator
-├── utils.py            # Helper Functions
-│
-├── assets/
-│   ├── style.css
-│   └── logo.png
-│
+├── app.py
+├── rag.py
+├── matcher.py
+├── parser.py
+├── chunking.py
+├── search.py
+├── utils.py
+├── pdf_report.py
 ├── requirements.txt
-├── README.md
-└── .gitignore
+├── .env
+│
+└── screenshots/
+    ├── home.png
+    ├── ats_score.png
+    ├── radar.png
+    ├── analysis.png
+    └── chat.png
 ```
 
 ---
 
-# ⚙️ Installation
+# 📸 Application Screenshots
 
-Clone the repository:
+## 🏠 Resume Upload & Job Description
+
+![Home](screenshots/home.png.png)
+
+
+---
+
+## 🎯 ATS Match Score
+
+![ATS Score](screenshots/ats_score.png.png)
+
+
+---
+
+## 🧠 Skill Profile Visualization
+
+![Radar](screenshots/radar.png.png)
+
+
+---
+
+## 📊 AI Resume Analysis Report
+
+![Analysis](screenshots/analysis.png.png)
+
+
+---
+
+## 💬 Chat With Your Resume
+
+![Chat](screenshots/chat.png.png)
+
+# ▶️ Run Locally
+
+## 1. Clone Repository
 
 ```bash
-git clone https://github.com/your-username/ResumeMatch-AI.git
+git clone https://github.com/Ai-MAFlutter/ResumeMatch-AI.git
 ```
 
-Navigate to the project folder:
+---
 
-```bash
-cd ResumeMatch-AI
-```
-
-Create virtual environment:
+## 2. Create Virtual Environment
 
 ```bash
 python -m venv .venv
 ```
 
-Activate environment:
+Activate:
 
 Windows:
 
@@ -179,7 +182,9 @@ Windows:
 .venv\Scripts\activate
 ```
 
-Install dependencies:
+---
+
+## 3. Install Dependencies
 
 ```bash
 pip install -r requirements.txt
@@ -187,71 +192,81 @@ pip install -r requirements.txt
 
 ---
 
-# 🔑 Environment Setup
+## 4. Setup Environment Variables
 
 Create a `.env` file:
 
-```
+```env
 GROQ_API_KEY=your_api_key_here
 ```
 
 ---
 
-# ▶️ Run Application
-
-Start Streamlit:
+## 5. Run Application
 
 ```bash
 streamlit run app.py
 ```
 
-The application will open at:
+---
+
+# 📌 Example Usage
+
+### Input:
+
+Resume:
 
 ```
-http://localhost:8501
+Python Developer Resume
+```
+
+Job Description:
+
+```
+Looking for AI Python Developer with:
+- Python
+- FastAPI
+- Docker
+- LLM
+- RAG
+- Cloud
 ```
 
 ---
 
-# 📸 Screenshots
+### Output:
 
-(Add your application screenshots here)
+The application provides:
+
+- ATS Match Score
+- Matching Skills
+- Missing Skills
+- AI Recommendations
+- Resume Improvement Roadmap
+
+---
+
+# 🤖 AI Capabilities
+
+The project uses LLMs to:
+
+- Understand resume context
+- Analyze job requirements
+- Generate professional feedback
+- Answer questions about the resume
 
 ---
 
 # 🔮 Future Improvements
 
-Planned features:
-
-- 🌙 Dark / Light Mode
-- 🎨 Advanced Glassmorphism UI
-- 👤 Automatic Resume Information Extraction
-- 📌 Keyword Recommendation System
-- 📱 Flutter Mobile Application
-- ☁️ Cloud Deployment
-- 🔐 User Authentication
-
----
-
-# 🎯 Learning Outcomes
-
-Through this project, I gained practical experience with:
-
-- Building AI-powered applications.
-- Implementing RAG pipelines.
-- Working with LLM APIs.
-- Prompt Engineering.
-- Resume parsing and NLP processing.
-- Creating interactive AI dashboards.
+- Add user authentication
+- Deploy on cloud platform
+- Add more resume templates
+- Improve skill matching using embeddings
+- Add multilingual resume support
 
 ---
 
 # 👩‍💻 Author
 
-**Marina Wahid**
-
-AI & Software Developer
-
----
-
-⭐ If you find this project useful, consider giving it a star!
+Built with ❤️ using Python, AI, RAG, and Streamlit.
