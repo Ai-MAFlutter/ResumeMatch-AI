@@ -8,8 +8,203 @@ from chunking import split_text
 from search import build_index
 from pdf_report import generate_report
 from rag import analyze_resume, ask_resume
+# =====================================================
+# ATS GAUGE CHART
+# =====================================================
+
+def create_ats_gauge(score):
+
+    if score < 40:
+        color = "#EF4444"
+
+    elif score < 70:
+        color = "#F59E0B"
+
+    else:
+        color = "#22C55E"
 
 
+    fig = go.Figure(
+        go.Indicator(
+
+            mode="gauge+number",
+
+            value=score,
+
+            title={
+                "text": "ATS Match Score"
+            },
+
+            gauge={
+
+                "axis": {
+                    "range": [0, 100]
+                },
+
+                "bar": {
+                    "color": color
+                },
+
+                "steps": [
+
+                    {
+                        "range": [0, 40],
+                        "color": "#450A0A"
+                    },
+
+                    {
+                        "range": [40, 70],
+                        "color": "#78350F"
+                    },
+
+                    {
+                        "range": [70, 100],
+                        "color": "#064E3B"
+                    }
+
+                ]
+
+            }
+
+        )
+    )
+
+
+    fig.update_layout(
+
+        height=350,
+
+        paper_bgcolor="#0F172A",
+
+        font={
+            "color":"white"
+        }
+
+    )
+
+
+    return fig
+# =====================================================
+# SKILLS RADAR CHART
+# =====================================================
+
+def create_skill_radar(skill_scores):
+
+    categories = list(skill_scores.keys())
+
+    values = list(skill_scores.values())
+
+
+    # Close radar shape
+    values.append(values[0])
+    categories.append(categories[0])
+
+
+    fig = go.Figure()
+
+
+    fig.add_trace(
+
+        go.Scatterpolar(
+
+            r=values,
+
+            theta=categories,
+
+            fill="toself",
+
+            name="Skill Level",
+
+            line=dict(
+                color="#22C55E",
+                width=3
+            ),
+
+            marker=dict(
+                size=7
+            )
+
+        )
+
+    )
+
+
+    fig.update_layout(
+
+        polar=dict(
+
+            bgcolor="rgba(0,0,0,0)",
+
+            radialaxis=dict(
+
+                visible=True,
+
+                range=[0,100],
+
+                tickfont=dict(
+                    size=10,
+                    color="#64748B"
+                )
+
+            ),
+
+            angularaxis=dict(
+
+                tickfont=dict(
+                    size=12,
+                    color="#1F2937"
+                )
+
+            )
+
+        ),
+
+
+        showlegend=False,
+
+
+        height=450,
+
+
+        paper_bgcolor="rgba(0,0,0,0)",
+
+
+        plot_bgcolor="rgba(0,0,0,0)",
+
+
+        margin=dict(
+            l=40,
+            r=40,
+            t=70,
+            b=40
+        ),
+
+
+        font=dict(
+
+            color="#1F2937"
+
+        ),
+
+
+        title={
+
+            "text": "🧠 Skill Profile",
+
+            "x":0.05,
+
+            "font":{
+
+                "size":20
+
+            }
+
+        }
+
+    )
+
+
+    return fig
 # =====================================================
 # PAGE CONFIG
 # =====================================================
@@ -214,6 +409,8 @@ if uploaded_file and job_description:
 
             st.session_state.analysis = analysis
             st.session_state.index = index
+            st.session_state["job_description"] = job_description
+            st.session_state["resume_text"] = cleaned
 
             if os.path.exists(temp_path):
                 os.remove(temp_path)
@@ -268,12 +465,14 @@ if "analysis" in st.session_state:
             "❌ Missing Skills",
             len(analysis["missing"])
         )
-
-    st.progress(
-        analysis["score"] / 100
+    ats_chart = create_ats_gauge(
+        analysis["score"]
     )
 
-    st.divider()
+    st.plotly_chart(
+        ats_chart,
+        use_container_width=True
+    )
 
     # ==========================================
     # CHARTS
@@ -360,6 +559,27 @@ if "analysis" in st.session_state:
         st.plotly_chart(
 
             bar,
+
+            use_container_width=True
+
+        )
+        # ==========================================
+        # RADAR SKILL CHART
+        # ==========================================
+
+        st.divider()
+
+
+        radar = create_skill_radar(
+
+            analysis["skill_scores"]
+
+        )
+
+
+        st.plotly_chart(
+
+            radar,
 
             use_container_width=True
 
@@ -467,9 +687,10 @@ if "analysis" in st.session_state:
                 try:
 
                     answer = ask_resume(
-                        question,
-                        st.session_state.index
-                    )
+                    question,
+                    st.session_state["index"],
+                    st.session_state.get("job_description", "")
+                )
 
                     st.success("Answer")
 

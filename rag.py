@@ -5,8 +5,16 @@ from dotenv import load_dotenv
 from matcher import compare_skills
 
 
+# =====================================================
+# LOAD ENV
+# =====================================================
+
 load_dotenv()
 
+
+# =====================================================
+# GROQ CLIENT
+# =====================================================
 
 client = OpenAI(
     api_key=os.getenv("GROQ_API_KEY"),
@@ -14,90 +22,94 @@ client = OpenAI(
 )
 
 
+# =====================================================
+# AI INSTRUCTIONS
+# =====================================================
 
 INSTRUCTIONS = """
-You are an AI Resume Assistant.
+You are ResumeMatch AI, an expert resume assistant.
 
-Answer ONLY using the provided resume context.
+Your job is to answer questions about the uploaded resume.
 
-If the answer is not found in the resume,
-reply with:
+Rules:
 
-I don't know.
+- Use the provided resume context as the main source.
+- Answer professionally and clearly.
+- If the answer is partially available, explain what is available.
+- Do not invent skills, projects, or experience.
+- If the information does not exist, say:
+  "This information is not available in the uploaded resume."
+
+Never answer only with:
+"I don't know."
 """
 
+
+# =====================================================
+# PROMPTS
+# =====================================================
+
+PROMPT_TEMPLATE = """
+Resume Context:
+
+{context}
+
+
+User Question:
+
+{question}
+
+
+Answer based only on the resume context.
+"""
 
 
 PROMPT_TEMPLATE = """
-Question:
-{question}
+Resume Context:
 
-Resume:
 {context}
-"""
 
-
-
-MATCH_PROMPT_TEMPLATE = """
-You are an expert AI Resume Reviewer.
-
-Your task is to compare the candidate's resume with the job description.
-
-Resume:
-{resume}
 
 Job Description:
+
 {job}
 
-Question:
+
+User Question:
+
 {question}
 
-Analyze the resume carefully.
 
-Return your answer using exactly this format:
-
-Resume Match Score: <0-100>
-
-Matching Skills:
-- ...
-- ...
-- ...
-
-Missing Skills:
-- ...
-- ...
-- ...
-
-Recommendations:
-- ...
-- ...
-- ...
-
-Important Rules:
-- Base your analysis only on the provided resume and job description.
-- If a required skill is missing, list it under Missing Skills.
-- Do NOT answer with "I don't know".
-- Always provide a complete analysis.
+Answer based on the resume and job description.
+Give specific recommendations.
 """
-
 
 
 ANALYSIS_PROMPT = """
 You are a professional AI Career Advisor.
 
-Based on the following resume analysis, write a professional report.
+Create a professional resume evaluation report.
+
 
 Resume Match Score:
+
 {score}%
 
+
 Matching Skills:
+
 {matching}
 
+
 Missing Skills:
+
 {missing}
 
+
 Job Description:
+
 {job}
+
 
 
 Return:
@@ -113,103 +125,162 @@ Return:
 ## Final Recommendation
 
 
-Keep the report professional and concise.
+Keep the report concise and professional.
 """
 
 
+# =====================================================
+# BUILD CONTEXT
+# =====================================================
 
 def build_context(search_results):
 
+    if not search_results:
+
+        return "No resume information was found."
+
+
     context = ""
 
-    for result in search_results:
-        context += result["content"]
-        context += "\n\n"
+
+    for i, result in enumerate(search_results, start=1):
+
+        context += f"""
+Resume Section {i}:
+
+{result.get("content","")}
+
+"""
+
 
     return context
 
 
 
+# =====================================================
+# BUILD QUESTION PROMPT
+# =====================================================
 
-def build_prompt(question, search_results):
+def build_prompt(question, search_results, job_description):
 
     context = build_context(search_results)
 
+
     return PROMPT_TEMPLATE.format(
-        question=question,
-        context=context
-    )
+    question=question,
+    context=context,
+    job=job_description
+)
 
 
+# =====================================================
+# LLM CALL
+# =====================================================
 
-
-def llm(prompt, model="llama-3.3-70b-versatile"):
+def llm(
+    prompt,
+    model="llama-3.3-70b-versatile"
+):
 
     messages = [
+
         {
-            "role": "system",
-            "content": INSTRUCTIONS
+            "role":"system",
+            "content":INSTRUCTIONS
         },
+
         {
-            "role": "user",
-            "content": prompt
+            "role":"user",
+            "content":prompt
         }
+
     ]
 
 
     response = client.chat.completions.create(
+
         model=model,
+
         messages=messages,
+
         temperature=0
+
     )
 
 
     return response.choices[0].message.content
+# =====================================================
+# ASK RESUME
+# =====================================================
 
-
-
-
-
-def ask_resume(question, index):
-
+def ask_resume(question, index, job_description=""):
     search_results = index.search(
+
         question,
-        num_results=3
+
+        num_results=5
+
     )
 
 
     prompt = build_prompt(
-        question,
-        search_results
-    )
-
+    question,
+    search_results,
+    job_description
+)
 
     return llm(prompt)
 
 
 
+# =====================================================
+# BUILD MATCH PROMPT
+# =====================================================
 
+def build_match_prompt(
 
+    question,
 
-def build_match_prompt(question, resume_context, job_description):
+    resume_context,
+
+    job_description
+
+):
 
     return MATCH_PROMPT_TEMPLATE.format(
+
         resume=resume_context,
+
         job=job_description,
+
         question=question
+
     )
 
 
 
+# =====================================================
+# COMPARE RESUME WITH JOB
+# =====================================================
 
+def compare_resume(
 
+    question,
 
-def compare_resume(question, resume_text, job_description):
+    resume_text,
+
+    job_description
+
+):
 
     prompt = build_match_prompt(
+
         question,
+
         resume_text,
+
         job_description
+
     )
 
 
@@ -217,24 +288,50 @@ def compare_resume(question, resume_text, job_description):
 
 
 
+# =====================================================
+# ANALYZE RESUME
+# =====================================================
+
+def analyze_resume(
+
+    resume_text,
+
+    job_description
+
+):
 
 
+    # Calculate ATS score and skills
 
-def analyze_resume(resume_text, job_description):
-
-    # حساب الـ score والمهارات
     result = compare_skills(
+
         resume_text,
+
         job_description
+
     )
 
 
-    # إنشاء تقرير AI
+    # Generate AI report
+
     prompt = ANALYSIS_PROMPT.format(
+
         score=result["score"],
-        matching="\n".join(result["matching"]),
-        missing="\n".join(result["missing"]),
+
+        matching="\n".join(
+
+            result["matching"]
+
+        ),
+
+        missing="\n".join(
+
+            result["missing"]
+
+        ),
+
         job=job_description
+
     )
 
 
@@ -242,10 +339,16 @@ def analyze_resume(resume_text, job_description):
 
 
 
-    # نرجع كل البيانات للواجهة
     return {
-        "score": result["score"],
-        "matching": result["matching"],
-        "missing": result["missing"],
-        "report": report
-    }
+
+    "score": result["score"],
+
+    "matching": result["matching"],
+
+    "missing": result["missing"],
+
+    "skill_scores": result["skill_scores"],
+
+    "report": report
+
+}
